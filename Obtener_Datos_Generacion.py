@@ -14,9 +14,9 @@ import pandas as pd
 def conexionBDPostgresSQL():
     conexion = psycopg2.connect(
         dbname="emiliocardona_09mbid",
-        user="admin",
-        password="08rFHGN0j1im68956jwW7yYf",
-        host="formerly-top-toad-iad.a1.pgedge.io",
+        user="",
+        password="",
+        host="",
         port="5432"
     )
     return conexion
@@ -25,9 +25,9 @@ def conexionBDPostgresSQL():
 # 1.2 Con SQLALCHEMY(dataframeGeneracion):
 def conexionBD_SQLALCHEMY():
   # Datos de conexión a POSTGRESQL
-  usuario = 'admin'
-  password = '08rFHGN0j1im68956jwW7yYf'
-  servidor = 'formerly-top-toad-iad.a1.pgedge.io'  
+  usuario = ''
+  password = ''
+  servidor = ''  
   puerto = '5432'
   basedatos = 'emiliocardona_09mbid'
   # URL de conexión
