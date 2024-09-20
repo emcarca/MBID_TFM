@@ -12,24 +12,25 @@ import pandas as pd
 ## Se definen 2 posibles funciones para conexión a BD
 # 1.1 Con PSYCOPG2
 def conexionBDPostgresSQL():
+    # Se omiten los datos de conexión al tratarse de un entorno privado.
     conexion = psycopg2.connect(
-        dbname="emiliocardona_09mbid",
-        user="admin",
-        password="08rFHGN0j1im68956jwW7yYf",
-        host="formerly-top-toad-iad.a1.pgedge.io",
-        port="5432"
+        dbname="",
+        user="",
+        password="",
+        host="",
+        port=""
     )
     return conexion
 
 
 # 1.2 Con SQLALCHEMY(dataframeGeneracion):
 def conexionBD_SQLALCHEMY():
-  # Datos de conexión a POSTGRESQL
-  usuario = 'admin'
-  password = '08rFHGN0j1im68956jwW7yYf'
-  servidor = 'formerly-top-toad-iad.a1.pgedge.io'  
-  puerto = '5432'
-  basedatos = 'emiliocardona_09mbid'
+  # Datos de conexión a POSTGRESQL:  Se omiten los datos de conexión al tratarse de un entorno privado.
+  usuario = ''
+  password = ''
+  servidor = ''  
+  puerto = ''
+  basedatos = ''
   # URL de conexión
   urlConexion = f'postgresql+psycopg2://{usuario}:{password}@{servidor}:{puerto}/{basedatos}'
   # Motor conexión Postgresql
