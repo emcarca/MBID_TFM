@@ -1,0 +1,5 @@
+El directorio MBID_TFM/ObtencionDatos/ contiene los diferentes archivos .py
+implementados para la obtención de datos desde las diferentes fuentes 
+y su inserción en base de datos.
+
+IMPORTANTE: Se omiten los datos de conexión a la base de datos al tratarse de un entorno privado.
