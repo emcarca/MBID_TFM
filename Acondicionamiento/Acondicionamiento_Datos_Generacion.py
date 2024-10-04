@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
 from psycopg2 import sql
-import json
+import json 
 
 # 1. Conexión con BD
 # 1.1 Versión 1: Usando librería psycopg2
