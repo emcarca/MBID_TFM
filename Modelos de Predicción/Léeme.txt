@@ -1,0 +1,4 @@
+El código relativo a la implementación y optimización de los diferentes modelos 
+está contenido y ejecutado en el notebook: "ECardona_TFM_Modelos_Predicción". (También disponible en: https://drive.google.com/drive/folders/14NoCEXhXQ3w0fPsuI44QdcDhSUnwGsy6?usp=sharing)
+
+Nota: Esta sección del trabajo toma como datos de partida el dataset preprocesado con nombre: "datosPreprocesados_v20240901.csv"
