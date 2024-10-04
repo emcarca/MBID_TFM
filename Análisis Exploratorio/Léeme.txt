@@ -1,0 +1,6 @@
+El análisis exploratorio de datos está detallado en el notebook: "ECardona_TFM_Análisis_Exploratorio_Datos_(AED)" disponible en el siguiente enlace:
+https://drive.google.com/drive/folders/14NoCEXhXQ3w0fPsuI44QdcDhSUnwGsy6?usp=sharing
+
+Este archivo contiene el código fuente implementado así como sus resultados de ejecución para facilitar su lectura.
+
+Nota: Se opta por compartir desde google drive ya que Github no permite subir archivos de más de 25MB.
