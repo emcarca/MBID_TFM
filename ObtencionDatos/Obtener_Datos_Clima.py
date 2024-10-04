@@ -1,104 +1,165 @@
-import random
-import string
-from datetime import datetime, timedelta
-import psycopg2
-from psycopg2 import sql
-import json
-import pandas as pd
-
 """ DEFINICIÓN DE FUNCIONES AUXILIARES """
 """ Funciones Globales """
 # 1. Conexión con BD
-## Se definen 2 posibles funciones para conexión a BD
+# Se definen 2 posibles funciones para conexión a BD
+# Se omiten los datos de conexión al tratarse de un entorno privado.
 # 1.1 Con PSYCOPG2
 def conexionBDPostgresSQL():
     conexion = psycopg2.connect(
-        dbname="emiliocardona_09mbid",
-        user="admin",
-        password="08rFHGN0j1im68956jwW7yYf",
-        host="formerly-top-toad-iad.a1.pgedge.io",
+        dbname="",
+        user="",
+        password="",
+        host="",
         port="5432"
     )
     return conexion
 
+# 2. Funcion para obtener listado de estaciones desde BBDD
+def climatologiaObtenerListadoEstaciones():
+    # Crea un cursor para realizar operaciones en la base de datos
+    conexion = conexionBDPostgresSQL()
+    cursor = conexion.cursor()
 
-# 1.2 Con SQLALCHEMY(dataframeGeneracion):
-def conexionBD_SQLALCHEMY():
-  # Datos de conexión a POSTGRESQL
-  usuario = 'admin'
-  password = '08rFHGN0j1im68956jwW7yYf'
-  servidor = 'formerly-top-toad-iad.a1.pgedge.io'  
-  puerto = '5432'
-  basedatos = 'emiliocardona_09mbid'
-  # URL de conexión
-  urlConexion = f'postgresql+psycopg2://{usuario}:{password}@{servidor}:{puerto}/{basedatos}'
-  # Motor conexión Postgresql
-  engine = create_engine(urlConexion)
-  return engine
+    # Define tu consulta SQL
+    consulta_sql = """
+    SELECT codigoEstacionclimatica
+    FROM tfm.estacionclimatologiaprovincia
+    ORDER BY provincia ASC;
+    """
 
+    # Ejecuta la consulta
+    cursor.execute(consulta_sql)
 
-# 2. Insertar ConsultaAPI
-""" Función para registrar Consulta + Respuesta y almacenar esta información
-en bruto por si se precisa consultarla en el futuro """
-def insertarConsultaAPI(tipoAPI, urlConsulta, jsonRespuesta):
-    connection = conexionBDPostgresSQL()
-    if connection is None:
-        return
-    try:
-        cursor = connection.cursor()
-        insert_query = sql.SQL("""INSERT INTO tfm.consultas_api (tipoApi, urlConsulta, jsonRespuesta) VALUES (%s, %s, %s) """)
-        cursor.execute(insert_query, (tipoAPI, urlConsulta, jsonRespuesta))
-        connection.commit()
-        print("Inserción realizada con éxito")
-    except Exception as error:
-        print(f"Error al insertar en la base de datos: {error}")
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
+    # Recupera los resultados
+    resultados = cursor.fetchall()
 
-# 3. Función para ejecutar cualquier comando SQL
-def ejecutarComandoSQL(comandoSQL):
-  connection = conexionBDPostgresSQL()
-  if connection is None:
-      return
-  try:
-      cursor = connection.cursor()
-      cursor.execute(comandoSQL)
-      connection.commit()
-      print(f"Comando ejecutado con éxito: {comandoSQL[0:50]}")
-  except Exception as error:
-      print(f"Error al ejecutar el comando: {error}")
-  finally:
-      if connection:
-          cursor.close()
-          connection.close()
+    # Cierra el cursor y la conexión
+    cursor.close()
+    conexion.close()
 
-# 4. Función para ejecutar cualquier comando SQL (SELECT)
-def ejecutarComandoSQLSelect(comandoSQL):
-  connection = conexionBDPostgresSQL()
-  resultados = []
-  if connection is None:
-      return
-  try:
-      cursor = connection.cursor()
-      cursor.execute(comandoSQL)
-      # Obtener todos los resultados de la consulta
-      resultados = cursor.fetchall()
-      connection.commit()
-      print(f"Comando ejecutado con éxito: {comandoSQL[0:50]}")
-  except Exception as error:
-      print(f"Error al ejecutar el comando: \n{error}")
-  finally:
-    if connection:
-        cursor.close()
-        connection.close()
-    return resultados
+    # Convierte los resultados a una lista de códigos de estación climática
+    lista_codigos = [fila[0] for fila in resultados]
+    print(lista_codigos)
+    return lista_codigos
     
     
-""" FUNCIONES DEMANDA DE ENERGÍA """
+# 3. Descargar datos Climatológicos API - OPEN DATA
+def descargarDatosClimatologiaOpenData(listadoEstaciones):
+    # Código MAIN
+    # Parámetros de la solicitud
+    urlBaseApiOpenData = 'https://opendata.aemet.es/opendata/api/valores/climatologicos/diarios/datos/'
 
-  
-  
-  
-""" Código principal - Descarga de demanda de energía """
+    anyoInicio = 2011
+    anyoFin=2024
+
+    for estacionClimatica in listadoEstaciones:
+        # Iteración desde AnyoInicio a AnyoFin
+        for anyo in range(anyoInicio, anyoFin + 1):
+            # 1 semestre
+            print("1er Semestre: ", anyo)
+            start_date = datetime(anyo, 1, 1)
+            end_date = datetime(anyo, 6, 30, 23, 59)
+
+            # Crear el diccionario de parámetros
+            parametros = {
+                "fechaini": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
+                "fechafin": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
+                "estacion": estacionClimatica
+            }
+
+            # Completar URL consulta:             
+            urlDatosClimatologicos = urlBaseApiOpenData+'fechaini/'+parametros["fechaini"]+'UTC/fechafin/'+parametros["fechafin"]+'UTC/estacion/'+parametros["estacion"]
+            # print("urlDatosClimatologicos: ", urlDatosClimatologicos)
+            
+            # Invocar API OpenData
+            datos = invocacionApiOpenData(urlDatosClimatologicos)
+            # Insertar BBDD
+            ClimatologiaProvincias_JSONData_InsertBD(datos)
+            insertarConsultaAPI("Climatología", urlDatosClimatologicos , json.dumps(datos))
+
+            # 2 semestre
+            print("2o Semestre: ", anyo)
+            start_date = datetime(anyo, 7, 1)
+            end_date = datetime(anyo, 12, 31, 23, 59)
+
+            # Crear el diccionario de parámetros
+            parametros = {
+                "fechaini": start_date.strftime("%Y-%m-%dT%H:%M:%S"),
+                "fechafin": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
+                "estacion": estacionClimatica
+            }
+
+            # Completar URL consulta: 
+            urlDatosClimatologicos = urlBaseApiOpenData+'fechaini/'+parametros["fechaini"]+'UTC/fechafin/'+parametros["fechafin"]+'UTC/estacion/'+parametros["estacion"]
+            print("urlDatosClimatologicos: ", urlDatosClimatologicos)
+            
+            # Invocar API OpenData
+            datos = invocacionApiOpenData(urlDatosClimatologicos)
+            # Insertar BBDD
+            ClimatologiaProvincias_JSONData_InsertBD(datos)
+            insertarConsultaAPI("Climatología", urlDatosClimatologicos , json.dumps(datos))
+            
+
+""" Código principal MAIN """
+# AEMET OpenData
+# Paso 1. Obtener listado de estaciones climatológicas
+import requests
+import pandas as pd
+
+# Parámetros de la solicitud
+api_url = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
+headers = {
+    'accept': 'application/json',
+    'api_key': '' # SE OMITE APY_KEY al ser nominal
+}
+
+# Realizar la solicitud GET
+response = requests.get(api_url, headers=headers)
+
+# Verificar si la solicitud fue exitosa
+if response.status_code == 200:
+    data = response.json()
+    if data.get('estado') == 200:
+        # Descargar los datos desde la URL proporcionada
+        data_url = data.get('datos')
+        datos_response = requests.get(data_url)
+        if datos_response.status_code == 200:
+            datos = datos_response.json()
+
+            # Verificar que los datos están en el formato esperado
+            if isinstance(datos, list):
+                # Crear una lista para almacenar los datos extraídos
+                datos_estaciones = []
+
+                # Extraer los campos deseados
+                for entry in datos:
+                    idestacion = entry.get('idema')
+                    longitud = entry.get('lon')
+                    latitud = entry.get('lat')
+                    ubi = entry.get('ubi')
+                    if idestacion is not None and ubi is not None:
+                        datos_estaciones.append({
+                            'idestacion': idestacion,
+                            'longitud': longitud,
+                            'latitud': latitud,
+                            'ubi': ubi
+                        })
+
+                # Crear el DataFrame
+                estacionesClimatologicas = pd.DataFrame(datos_estaciones)
+                print(estacionesClimatologicas)
+                estacionesClimatologicas.to_csv('estaciones.csv', index=False)
+            else:
+                print("Los datos no están en el formato esperado (deberían ser una lista).")
+        else:
+            print(f"Error al descargar los datos: {datos_response.status_code}")
+    else:
+        print(f"Error en la respuesta de la API: {data.get('descripcion')}")
+else:
+    print(f"Error en la solicitud: {response.status_code}")
+
+# Se lee manualmente el CSV y se insertan 52 registros de staciones en base de datos.
+
+# Paso 2: Obtener datos climatología
+listadoEstaciones = climatologiaObtenerListadoEstaciones()
+descargarDatosClimatologiaOpenData(listadoEstaciones)
