@@ -151,3 +151,10 @@ def ejecutarComandoSQLSelect(comandoSQL):
         cursor.close()
         connection.close()
     return resultados
+
+
+""" Código principal (MAIN) """
+# Paso 1: Vaciar la tabla en la que se insertarán los registros acondicionados
+ejecutarComandoSQL("TRUNCATE TABLE tfm.preproc_energiageneracion;")
+# Paso 2: Ejecución de la función que acondiciona los datos.
+Preprocesamiento_GeneracionEnergia_ToDataframe()
