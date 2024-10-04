@@ -2,4 +2,6 @@ El directorio MBID_TFM/ObtencionDatos/ contiene los diferentes archivos .py
 implementados para la obtención de datos desde las diferentes fuentes 
 y su inserción en base de datos.
 
+PRECIOS: El archivo EXCEL "OMIE_Precios_historico.xlsx" contiene los registros facilitados por OMIE y es el archivo que se procesa.
+
 IMPORTANTE: Se omiten los datos de conexión a la base de datos al tratarse de un entorno privado.
