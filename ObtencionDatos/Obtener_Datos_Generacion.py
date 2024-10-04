@@ -9,7 +9,7 @@ import pandas as pd
 """ DEFINICIÓN DE FUNCIONES AUXILIARES """
 """ Funciones Globales """
 # 1. Conexión con BD
-## Se definen 2 posibles funciones para conexión a BD
+# Se definen 2 posibles funciones para conexión a BD
 # 1.1 Con PSYCOPG2
 def conexionBDPostgresSQL():
     # Se omiten los datos de conexión al tratarse de un entorno privado.
