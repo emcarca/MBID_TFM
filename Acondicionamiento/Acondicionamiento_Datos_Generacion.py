@@ -1,25 +1,32 @@
-import random
-import string
-from datetime import datetime, timedelta
-import psycopg2
-from psycopg2 import sql
-import json
-import pandas as pd
-
-""" DEFINICIÓN DE FUNCIONES AUXILIARES """
 ### PENDIENTE DE AJUSTAR PARA UNIDAD MEDIA QUE NO CARGA MW
 # Definición de funciones
 import sqlite3
 import pandas as pd
 from sqlalchemy import create_engine
+import psycopg2
+from psycopg2 import sql
+import json
 
+# 1. Conexión con BD
+# 1.1 Versión 1: Usando librería psycopg2
+def conexionBDPostgresSQL():
+    connection = psycopg2.connect(
+        dbname="",
+        user="",
+        password="",
+        host="",
+        port="5432"
+    )
+    return connection
+
+# 1.2 Insertar datos Generación
 def Generacion_Preprocesado_InsertBD_SQLALCHEMY(dataframeGeneracion):
   # Datos de conexión a POSTGRESQL
-  usuario = 'admin'
-  password = '08rFHGN0j1im68956jwW7yYf'
-  servidor = 'formerly-top-toad-iad.a1.pgedge.io'  # o la dirección IP de tu servidor
+  usuario = ''
+  password = ''
+  servidor = ''  
   puerto = '5432'
-  basedatos = 'emiliocardona_09mbid'
+  basedatos = ''
 
   # Crear la URL de conexión
   urlConexion = f'postgresql+psycopg2://{usuario}:{password}@{servidor}:{puerto}/{basedatos}'
@@ -119,9 +126,28 @@ def Preprocesamiento_GeneracionEnergia_ToDataframe():
   # Insertar en BD
   Generacion_Preprocesado_InsertBD_SQLALCHEMY(dataframeGeneracion)
 
+  
+# 4. Función para ejecutar cualquier comando SQL (SELECT)
+def ejecutarComandoSQLSelect(comandoSQL):
+  connection = conexionBDPostgresSQL()
+  resultados = []
+  if connection is None:
+      return
+  try:
+      cursor = connection.cursor()
+      cursor.execute(comandoSQL)
+      # Obtener todos los resultados de la consulta
+      resultados = cursor.fetchall()
 
-""" Código principal - Acondicionamiento de datos de generación de energía """
-# Vaciado de la tabla "preproc_energiageneracion"
-ejecutarComandoSQL("TRUNCATE TABLE tfm.preproc_energiageneracion;")
-# Ejecución de acondicionamiento de datos
-Preprocesamiento_GeneracionEnergia_ToDataframe()
+      # Imprimir los resultados
+      """for fila in resultados:
+          print(fila)"""
+      connection.commit()
+      print(f"Comando ejecutado con éxito: {comandoSQL[0:50]}")
+  except Exception as error:
+      print(f"Error al ejecutar el comando: \n{error}")
+  finally:
+    if connection:
+        cursor.close()
+        connection.close()
+    return resultados
