@@ -1,5 +1,5 @@
 """ DEFINICIÓN DE FUNCIONES AUXILIARES """
-""" Funciones Globales """
+""" Funciones Globales """ 
 import pandas as pd
 from sqlalchemy import create_engine
 import sqlite3
