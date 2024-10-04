@@ -110,7 +110,6 @@ def Demanda_JSONData_InsertBD(data):
           }
       datosDemanda.append(itemDemanda)
 
-  #print(datosDemanda)
   sqlScript = []
 
   for sqlItem in datosDemanda:
@@ -120,11 +119,10 @@ def Demanda_JSONData_InsertBD(data):
 
       sqlScript.append(sentenciaSQL)
 
-  # Separar instrucciones por línea
+  # Unir todas las sentencias SQL en una variable
   insertSQLScript = "\n".join(sqlScript)
 
-  #print(insertSQLScript)
-  print("Insertar registros - ")
+  print("Insertar registros - Demanda de energía")
   conexionBD = conexionBDPostgresSQL()
   # Crear un cursor
   cursor = conexionBD.cursor()
@@ -138,7 +136,7 @@ def Demanda_JSONData_InsertBD(data):
   # Cerrar el cursor y la conexión
   cursor.close()
   conexionBD.close()
-  print("Registros insertados - ")
+  print("Registros insertados - Demanda de energía ")
   
     
 """ Código principal - Descarga de demanda de energía """
